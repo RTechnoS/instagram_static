@@ -18,7 +18,7 @@ def chart():
 	autolabel(p)
 	plt.xticks(rotation = 20)
 	plt.savefig('p.jpg')
-	plt.close
+	plt.close('all')
 
 def hitung(jumlah):
 	#print('Followers : ', jumlah)
