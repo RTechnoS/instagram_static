@@ -1,10 +1,16 @@
 import requests, threading,time
+from datetime import datetime
 import matplotlib.pyplot as plt
 hed = {'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0'}
 trakhir = 0
 krg = 0
 pengurangan = [0,0,0,0,0,0,0] #ambil 6 data atau 60 menit
 ttt = ['60 Menit lalu','50 Menit lalu','40 Menit lalu','30 Menit lalu','20 Menit lalu','10 Menit lalu']
+
+def jam():
+	f = datetime.now().strftime("%H:%M:%S")
+	return f
+
 def chart():
 	def autolabel(rects):
 		for rect in rects:
@@ -18,9 +24,12 @@ def chart():
 	autolabel(p)
 	plt.xticks(rotation = 20)
 	plt.savefig('p.jpg')
-	plt.cla()
-	plt.clf()
-	plt.close('all')
+	with open('per10-Minute.txt', 'a') as tls:
+		tls.write(f'{pengurangan[-1]} ---- {jam()}\n')
+
+	# plt.cla()
+	# plt.clf()
+	#plt.close('all')
 
 
 def hitung(jumlah):
@@ -63,7 +72,8 @@ def st(nama):
 			trakhir = jml
 		except:
 			pass
-		if sec == 600:
+		if sec == 1:
+			
 			if krg < 0 :
 				krg = 0
 			pengurangan.append(krg)
