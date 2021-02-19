@@ -41,7 +41,7 @@ def hitung(jumlah):
 
 def st(nama):
 	global trakhir, krg
-	mnt = 0
+	sec = 0
 	while True:
 		try:
 			js = requests.get('https://www.instagram.com/{}/channel/?__a=1'.format(nama), headers=hed).json()
@@ -60,15 +60,15 @@ def st(nama):
 			trakhir = jml
 		except:
 			pass
-		if mnt == 3:
+		if sec == 600:
 			if krg < 0 :
 				krg = 0
 			pengurangan.append(krg)
-			mnt = 0
+			sec = 0
 			krg = 0
 			t = threading.Thread(target=chart)
 			t.start()
-		mnt += 1
+		sec += 1
 		time.sleep(1)
 
 if __name__ == '__main__':
