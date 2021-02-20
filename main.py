@@ -1,14 +1,16 @@
 import requests, threading,time
-from datetime import datetime
+import datetime
 import matplotlib.pyplot as plt
 hed = {'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0'}
 trakhir = 0
+menit_awal = 0
 krg = 0
-pengurangan = [0,0,0,0,0,0,0] #ambil 6 data atau 60 menit
-ttt = ['60 Menit lalu','50 Menit lalu','40 Menit lalu','30 Menit lalu','20 Menit lalu','10 Menit lalu']
+pengurangan = [0,0,0,0,0,0] #ambil 6 data atau 60 menit
+ttt = ['--','--','--','--','--','--']
+
 
 def jam():
-	f = datetime.now().strftime("%H:%M:%S")
+	f = datetime.datetime.now().strftime("%H:%M:%S")
 	return f
 
 def chart():
@@ -20,7 +22,7 @@ def chart():
 				xytext=(0, 2),  # 3 points vertical offset
 				textcoords="offset points",
 				ha='center', va='bottom')	
-	p = plt.bar(ttt, pengurangan[-6:], color='r')
+	p = plt.bar(ttt[-6:], pengurangan[-6:], color='r')
 	autolabel(p)
 	plt.xticks(rotation = 20)
 	plt.savefig('p.jpg')
@@ -53,36 +55,42 @@ def hitung(jumlah):
 
 def st(nama):
 	global trakhir, krg
-	sec = 0
+	start_sec = 0
 	while True:
+		if start_sec == 0:
+			start_sec = time.time()
 		try:
 			js = requests.get('https://www.instagram.com/{}/channel/?__a=1'.format(nama), headers=hed).json()
 			jml = js['graphql']['user']['edge_followed_by']['count']
 			if trakhir == 0:
+				menit_awal = jml
 				trakhir = jml
 
 			if jml < trakhir:
 				y = ('-'+str(trakhir-jml))
-				krg += trakhir-jml
 			else:
 				y = ('+'+str(jml-trakhir))
-				krg -= jml-trakhir
 
 			print('Follower : ',hitung(str(jml)), f' ({y}')
 			trakhir = jml
+			
 		except:
 			pass
-		if sec == 1:
-			
+		
+		if time.time()-start_sec >= 600: #600 = 10menit
+			#print(datetime.timedelta(seconds=start_sec), datetime.timedelta(seconds=time.time()))
+			#print(menit_awal, jml)
+			krg = menit_awal-jml
 			if krg < 0 :
 				krg = 0
+			ttt.append(jam())
 			pengurangan.append(krg)
-			sec = 0
-			krg = 0
+			start_sec = time.time()
 			t = threading.Thread(target=chart)
 			t.start()
-		sec += 1
-		time.sleep(1)
+			menit_awal = jml
+		
+		time.sleep(0.8)
 
 if __name__ == '__main__':
 	name = input('Username : ')
