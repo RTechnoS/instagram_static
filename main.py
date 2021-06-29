@@ -1,12 +1,18 @@
 import requests, threading,time
 import datetime
+import argparse
 import matplotlib.pyplot as plt
-hed = {'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0'}
+hed = {
+'Host':'www.instagram.com',
+'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0'}
 trakhir = 0
 menit_awal = 0
-krg = 0
-pengurangan = [0,0,0,0,0,0] #ambil 6 data atau 60 menit
+showBar = 6 #default 6
+updateTime = 60
+hasilAwal = [0,0,0,0,0,0] #ambil 6 data atau 60 menit
 ttt = ['--','--','--','--','--','--']
+
 
 
 def jam():
@@ -17,21 +23,27 @@ def chart():
 	def autolabel(rects):
 		for rect in rects:
 			height = rect.get_height()
-			plt.annotate('{}'.format(height),
+
+			if height > 0 :
+				h = '+'+str(height)
+			else:
+				h = height
+
+			plt.annotate('{}'.format(h),
 				xy=(rect.get_x() + rect.get_width() / 2, height),
 				xytext=(0, 2),  # 3 points vertical offset
 				textcoords="offset points",
 				ha='center', va='bottom')	
-	p = plt.bar(ttt[-6:], pengurangan[-6:], color='r')
+	p = plt.bar(ttt[-showBar:], hasilAwal[-showBar:], color='#17eaea')
 	autolabel(p)
 	plt.xticks(rotation = 20)
 	plt.savefig('p.jpg')
 	with open('per10-Minute.txt', 'a') as tls:
-		tls.write(f'{pengurangan[-1]} ---- {jam()}\n')
+		tls.write(f'{hasilAwal[-1]} ---- {jam()}\n')
 
 	# plt.cla()
 	# plt.clf()
-	#plt.close('all')
+	plt.close('all')
 
 
 def hitung(jumlah):
@@ -54,13 +66,15 @@ def hitung(jumlah):
 	return jumlah
 
 def st(nama):
-	global trakhir, krg
+	global trakhir
 	start_sec = 0
+
 	while True:
 		if start_sec == 0:
 			start_sec = time.time()
+		
 		try:
-			js = requests.get('https://www.instagram.com/{}/channel/?__a=1'.format(nama), headers=hed).json()
+			js = requests.post(f'http://www.instagram.com/{nama}/channel/?__a=1', headers=hed).json()
 			jml = js['graphql']['user']['edge_followed_by']['count']
 			if trakhir == 0:
 				menit_awal = jml
@@ -71,20 +85,18 @@ def st(nama):
 			else:
 				y = ('+'+str(jml-trakhir))
 
-			print('Follower : ',hitung(str(jml)), f' ({y}')
+			print(f'({jam()}) ',hitung(str(jml)), f' ({y})')
 			trakhir = jml
 			
 		except:
 			pass
 		
-		if time.time()-start_sec >= 600: #600 = 10menit
+		if time.time()-start_sec >= updateTime: #600 = 10menit
 			#print(datetime.timedelta(seconds=start_sec), datetime.timedelta(seconds=time.time()))
 			#print(menit_awal, jml)
-			krg = menit_awal-jml
-			if krg < 0 :
-				krg = 0
+			jum = jml-menit_awal
 			ttt.append(jam())
-			pengurangan.append(krg)
+			hasilAwal.append(jum)
 			start_sec = time.time()
 			t = threading.Thread(target=chart)
 			t.start()
@@ -93,5 +105,18 @@ def st(nama):
 		time.sleep(0.8)
 
 if __name__ == '__main__':
-	name = input('Username : ')
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-u", "--update", help="how many minutes to update char bar. default: 1 minute",type=int)
+	parser.add_argument("-s", "--showbar", help="how many bar in chart. default: 6 bar", type=int)
+	args = parser.parse_args()
+	if args.update:
+		if args.update > 0:
+			updateTime = args.update*60
+	if args.showbar:
+		if args.showbar > 0:
+			hasilAwal = [0]*args.showbar
+			ttt = ['--']*args.showbar
+			showBar = args.showbar
+
+	name = str(input('Username : @'))
 	st(name)
