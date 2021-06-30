@@ -9,9 +9,9 @@ hed = {
 'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0'}
 
 
-def hitung(jumlah):
-	#print('Followers : ', jumlah)
-	plt.figure(dpi=100)
+def hitung(jumlah): #mengubah angka contoh : 3200000 menjadi 3.200.000
+	jumlah = str(jumlah)
+	
 	dt = []
 	pjg = len(jumlah)
 	p = jumlah
@@ -35,15 +35,13 @@ def jam():
 class Mulai:
 	def __init__(self, username, update=1, showbar=6, output=False):
 		self.user = username
-		self.update = 60*update
+		self.update = 5*update   #600 = 10menit
 		self.showbar = showbar
 		self.trakhir = 0
 		self.menit_awal = 0
 		self.output = output
 
 		self.data = [[[0]*showbar], [['--']*showbar]]
-
-
 
 
 	def st(self):
@@ -75,9 +73,8 @@ class Mulai:
 			except:
 				pass
 			
-			if time.time()-start_sec >= self.update: #600 = 10menit
+			if time.time()-start_sec >= self.update: 
 				#print(datetime.timedelta(seconds=start_sec), datetime.timedelta(seconds=time.time()))
-				#print(self.menit_awal, jml)
 				jum = jml-self.menit_awal
 
 				self.data[0][0].append(jum)
@@ -107,11 +104,11 @@ class Mulai:
 					xytext=(0, 2),  # 3 points vertical offset
 					textcoords="offset points",
 					ha='center', va='bottom')	
-
+		
 		p = plt.bar(self.data[1][0][-self.showbar:], self.data[0][0][-self.showbar:], color='#17eaea')
 		autolabel(p)
 		plt.xticks(rotation = 20)
-		plt.savefig('bar.jpg')
+		plt.savefig('@'+self.user+'.jpg')
 		
 		if output != False:
 			if output == None:
@@ -120,13 +117,17 @@ class Mulai:
 				n = output
 			
 
-			if os.path.exists(n):
+			if self.data[0][0][-1] > 0 :
+				perubahan = '+'+str(self.data[0][0][-1])
+			else:
+				perubahan = self.data[0][0][-1]
 
+			if os.path.exists(n):
 				with open(n, 'a') as tls:
-					tls.write(f'{jam()} | {self.menit_awal}  ({self.data[0][0][-1]})\n')
+					tls.write(f'{jam()} | {hitung(self.menit_awal)}  ({perubahan})\n')
 			else:
 				with open(n, 'w') as tls:
-					tls.write(f'{jam()} | {self.menit_awal}  ({self.data[0][0][-1]})\n')
+					tls.write(f'{jam()} | {hitung(self.menit_awal)}  ({perubahan})\n')
 
 
 		plt.close('all')
