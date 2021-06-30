@@ -35,7 +35,7 @@ def jam():
 class Mulai:
 	def __init__(self, username, update=1, showbar=6, output=False):
 		self.user = username
-		self.update = 5*update   #600 = 10menit
+		self.update = 60*update   #600 = 10menit
 		self.showbar = showbar
 		self.trakhir = 0
 		self.menit_awal = 0
