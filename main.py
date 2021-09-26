@@ -8,6 +8,8 @@ hed = {
 'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
 'User-Agent':'Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101 Firefox/85.0'}
 
+SLEEPREFRESH = 0.8 # 5 = 5 detik
+
 
 def hitung(jumlah): #mengubah angka contoh : 3200000 menjadi 3.200.000
 	jumlah = str(jumlah)
@@ -73,8 +75,7 @@ class Mulai:
 			except:
 				pass
 			
-			if time.time()-start_sec >= self.update: 
-				#print(datetime.timedelta(seconds=start_sec), datetime.timedelta(seconds=time.time()))
+			if time.time()-start_sec >= self.update:
 				jum = jml-self.menit_awal
 
 				self.data[0][0].append(jum)
@@ -85,7 +86,7 @@ class Mulai:
 				t.start()
 				self.menit_awal = jml
 			
-			time.sleep(0.8)
+			time.sleep(SLEEPREFRESH)
 
 
 	def chart(self):
@@ -108,11 +109,11 @@ class Mulai:
 		p = plt.bar(self.data[1][0][-self.showbar:], self.data[0][0][-self.showbar:], color='#17eaea')
 		autolabel(p)
 		plt.xticks(rotation = 20)
-		plt.savefig('@'+self.user+'.jpg')
+		plt.savefig(self.user+'.jpg')
 		
 		if output != False:
 			if output == None:
-				n = '@'+self.user+'.txt'
+				n = self.user+'.txt'
 			else:
 				n = output
 			
