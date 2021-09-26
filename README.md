@@ -35,6 +35,7 @@ maka setiap 1 detik akan di print di terminal, contoh output :
 09:41:36 | 348.340.628 (+5)
 
 4. Bar Chart akan di tambahkan setiap waktu yang ditentukan (Default 1 menit) dan disimpan dalam format .jpg dengan lokasi gambar yaitu username.jpg
+<center><img width=50% src="media/exchartbar.jpg"></center>
 
 5. Setiap log perubahan pada Bar Chart akan disimpan (Default username.txt)
 
